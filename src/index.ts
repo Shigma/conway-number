@@ -1,5 +1,6 @@
 import Dyadic from './dyadic'
 export * from './comparison'
+export * from './arithmetic'
 export { Dyadic }
 
 export interface ConwayNumber {

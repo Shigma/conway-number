@@ -1,4 +1,4 @@
-import {ConwayNumber, from} from './index'
+import { ConwayNumber, from } from './index'
 
 /** unary relation */
 type UniRel = (x: ConwayNumber) => ConwayNumber
@@ -7,30 +7,18 @@ type UniRel = (x: ConwayNumber) => ConwayNumber
 type BinRel = (x: ConwayNumber, y: ConwayNumber) => ConwayNumber
 
 /** negative */
-export const negative: UniRel = x => {
-    return from(x.R.map(negative), x.L.map(negative))
-}
+export const negative: UniRel = x => from(x.R.map(negative), x.L.map(negative))
 
 /** add */
 export const add: BinRel = (x, y) => {
-    let L: ConwayNumber[] = []
-    let R: ConwayNumber[] = []
-    x.L.forEach(xl => {
-        L.push(add(xl, y))
-    })
-    y.L.forEach(yl => {
-        L.push(add(x, yl))
-    })
-    x.R.forEach(xr => {
-        R.push(add(xr, y))
-    })
-    y.R.forEach(yr => {
-        R.push(add(x, yr))
-    })
-    return from(L, R)
+  return from([
+    ...x.L.map(xl => add(xl, y)),
+    ...y.L.map(yl => add(x, yl)),
+  ], [
+    ...x.R.map(xr => add(xr, y)),
+    ...y.R.map(yr => add(x, yr)),
+  ])
 }
 
-/** sub */
-export const sub: BinRel = (x, y) => {
-    return add(x, negative(y))
-}
+/** subtract */
+export const sub: BinRel = (x, y) => add(x, negative(y))

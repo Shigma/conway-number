@@ -40,14 +40,18 @@ export default class ConwayDyadic implements ConwayNumber {
   }
 
   get L() {
-    return this.numerator ? [new ConwayDyadic(this._ln, this._lp)] : []
+    if (!this.numerator || !this._lp && this._ln + 1 < this._rn && this._rn <= 0) return []
+    return [new ConwayDyadic(this._ln, this._lp)]
   }
 
   get R() {
-    return this.numerator ? [new ConwayDyadic(this._rn, this._rp)] : []
+    if (!this.numerator || !this._rp && this._ln + 1 < this._rn && this._ln >= 0) return []
+    return [new ConwayDyadic(this._rn, this._rp)]
   }
 
-  toString() {
-    return `${this.numerator}/${1 << this.power}`
+  toString(): string {
+    return this.power
+      ? `${this.numerator}/${1 << this.power}`
+      : this.numerator.toString()
   }
 }

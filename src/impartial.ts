@@ -22,4 +22,10 @@ export default class ConwayImpartial implements ConwayNumber {
   get R(): ConwayNumber[] {
     return impartials.slice(0, this.order)
   }
+
+  toString(): string {
+    return this.order
+      ? `<Impartial: ${this.order}>`
+      : '0'
+  }
 }

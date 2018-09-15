@@ -1,12 +1,12 @@
-import { ConwayNumber, from } from './index'
+import { ConwayNumber, build } from './index'
 import { UniOp, BinOp, MultiOp } from './types'
 
 /** negative */
-export const negative: UniOp<ConwayNumber> = x => from(x.R.map(negative), x.L.map(negative))
+export const negative: UniOp<ConwayNumber> = x => build(x.R.map(negative), x.L.map(negative))
 
 const addTwo: BinOp<ConwayNumber> = (x, y?) => {
   if (!y) return x
-  return from([
+  return build([
     ...x.L.map(xl => addTwo(xl, y)),
     ...y.L.map(yl => addTwo(x, yl)),
   ], [
@@ -25,7 +25,7 @@ export const sub: BinOp<ConwayNumber> = (x, y) => addTwo(x, negative(y))
 
 const multiplyTwo: BinOp<ConwayNumber> = (x, y?) => {
   if (!y) return x
-  return from([
+  return build([
     ...[].concat(...x.L.map(xl => y.L.map((yl) => {
       return sub(addTwo(multiplyTwo(xl, y), multiplyTwo(x, yl)), multiplyTwo(xl, yl))
     }))),

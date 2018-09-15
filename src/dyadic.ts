@@ -1,11 +1,11 @@
 import { ConwayNumber } from './index'
 
-interface DivideResult {
+interface DevideResult {
   order: number
   quotient: number
 }
 
-function dividedBy2(n: number, max: number = Infinity): DivideResult {
+export function devidedBy2(n: number, max: number = Infinity): DevideResult {
   let i = 0
   while (n % 2 === 0 && i < max) {
     i += 1
@@ -29,11 +29,11 @@ export default class ConwayDyadic implements ConwayNumber {
     this.numerator = numerator
     this.power = power
     if (numerator) {
-      let result: DivideResult
-      result = dividedBy2(numerator - 1, power)
+      let result: DevideResult
+      result = devidedBy2(numerator - 1, power)
       this._ln = result.quotient
       this._lp = power - result.order
-      result = dividedBy2(numerator + 1, power)
+      result = devidedBy2(numerator + 1, power)
       this._rn = result.quotient
       this._rp = power - result.order
     }

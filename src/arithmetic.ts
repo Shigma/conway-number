@@ -7,11 +7,11 @@ export const negative: UniOp<ConwayNumber> = x => from(x.R.map(negative), x.L.ma
 const addTwo: BinOp<ConwayNumber> = (x, y?) => {
   if (!y) return x
   return from([
-    ...x.L.map(xl => add(xl, y)),
-    ...y.L.map(yl => add(x, yl)),
+    ...x.L.map(xl => addTwo(xl, y)),
+    ...y.L.map(yl => addTwo(x, yl)),
   ], [
-    ...x.R.map(xr => add(xr, y)),
-    ...y.R.map(yr => add(x, yr)),
+    ...x.R.map(xr => addTwo(xr, y)),
+    ...y.R.map(yr => addTwo(x, yr)),
   ])
 }
 
@@ -22,3 +22,27 @@ export const add: MultiOp<ConwayNumber> = (...list) => {
 
 /** subtract */
 export const sub: BinOp<ConwayNumber> = (x, y) => addTwo(x, negative(y))
+
+const multiplyTwo: BinOp<ConwayNumber> = (x, y?) => {
+  if (!y) return x
+  return from([
+    ...[].concat(...x.L.map(xl => y.L.map((yl) => {
+      return sub(addTwo(multiplyTwo(xl, y), multiplyTwo(x, yl)), multiplyTwo(xl, yl))
+    }))),
+    ...[].concat(...x.R.map(xr => y.R.map((yr) => {
+      return sub(addTwo(multiplyTwo(xr, y), multiplyTwo(x, yr)), multiplyTwo(xr, yr))
+    }))),
+  ], [
+    ...[].concat(...x.L.map(xl => y.R.map((yr) => {
+      return sub(addTwo(multiplyTwo(xl, y), multiplyTwo(x, yr)), multiplyTwo(xl, yr))
+    }))),
+    ...[].concat(...x.R.map(xr => y.L.map((yl) => {
+      return sub(addTwo(multiplyTwo(xr, y), multiplyTwo(x, yl)), multiplyTwo(xr, yl))
+    }))),
+  ])
+}
+
+/** multiply */
+export const multiply: MultiOp<ConwayNumber> = (...list) => {
+  return list.reduce((prev, curr) => multiplyTwo(curr, prev))
+}

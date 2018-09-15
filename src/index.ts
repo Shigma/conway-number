@@ -2,11 +2,19 @@ export * from './comparison'
 export * from './arithmetic'
 
 import Dyadic from './dyadic'
-export { Dyadic }
+import Impartial from './impartial'
+export { Dyadic, Impartial }
 
 export interface ConwayNumber {
   L: ConwayNumber[]
   R: ConwayNumber[]
+  toString?: () => string
+}
+
+export const Zero: ConwayNumber = {
+  toString: () => '0',
+  L: [],
+  R: [],
 }
 
 export function from(L: ConwayNumber[], R: ConwayNumber[]): ConwayNumber {

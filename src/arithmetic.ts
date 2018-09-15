@@ -1,16 +1,11 @@
 import { ConwayNumber, from } from './index'
-
-/** unary relation */
-type UniRel = (x: ConwayNumber) => ConwayNumber
-
-/** binary relation */
-type BinRel = (x: ConwayNumber, y: ConwayNumber) => ConwayNumber
+import { UniOp, BinOp, MultiOp } from './types'
 
 /** negative */
-export const negative: UniRel = x => from(x.R.map(negative), x.L.map(negative))
+export const negative: UniOp<ConwayNumber> = x => from(x.R.map(negative), x.L.map(negative))
 
-/** add */
-export const add: BinRel = (x, y) => {
+const addTwo: BinOp<ConwayNumber> = (x, y?) => {
+  if (!y) return x
   return from([
     ...x.L.map(xl => add(xl, y)),
     ...y.L.map(yl => add(x, yl)),
@@ -20,5 +15,10 @@ export const add: BinRel = (x, y) => {
   ])
 }
 
+/** add */
+export const add: MultiOp<ConwayNumber> = (...list) => {
+  return list.reduce((prev, curr) => addTwo(curr, prev))
+}
+
 /** subtract */
-export const sub: BinRel = (x, y) => add(x, negative(y))
+export const sub: BinOp<ConwayNumber> = (x, y) => addTwo(x, negative(y))

@@ -22,3 +22,14 @@ export const add: BinRel = (x, y) => {
 
 /** subtract */
 export const sub: BinRel = (x, y) => add(x, negative(y))
+
+/** multiply */
+export const multiply: BinRel = (x, y) => {
+  return from([
+    ...[].concat(...x.L.map(xl => y.L.map(yl => sub(add(multiply(xl, y), multiply(x, yl)), multiply(xl, yl))))),
+    ...[].concat(...x.R.map(xr => y.R.map(yr => sub(add(multiply(xr, y), multiply(x, yr)), multiply(xr, yr))))),
+  ], [
+    ...[].concat(...x.L.map(xl => y.R.map(yr => sub(add(multiply(xl, y), multiply(x, yr)), multiply(xl, yr))))),
+    ...[].concat(...x.R.map(xr => y.L.map(yl => sub(add(multiply(xr, y), multiply(x, yl)), multiply(xr, yl))))),
+  ])
+}

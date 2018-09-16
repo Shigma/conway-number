@@ -84,8 +84,6 @@ const lexer = new (class extends Lexer {
           }
         },
       ],
-    }, {
-      entrance: 'main',
     })
   }
 })()
@@ -95,10 +93,11 @@ function parseNode(node: LexerToken): ConwayNumber {
     case 'impartial': return new ConwayImpartial(node.order)
     case 'dyadic': return new ConwayDyadic(node.numerator, node.power)
     case 'literal': return build(node.L.map(parseNode), node.R.map(parseNode))
+    default: throw new Error('Unsupported type: ' + node.type)
   }
 }
 
 export default function evaluate(source: string) {
-  const ast: LexerToken[] = lexer.parse(source)
+  const ast: LexerToken[] = lexer.parse(source).result
   return parseNode(ast[0])
 }

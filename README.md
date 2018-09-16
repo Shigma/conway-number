@@ -1,9 +1,9 @@
-# conway-number
+# Conway Number
 
 ## Usage
 
 ```
-npm instal conway-number
+npm install conway-number
 ```
 
 ```javascript
@@ -13,29 +13,29 @@ import * as conway from 'conway-number' // esmodule
 
 ## Basic
 
-- conway.build
-- conway.tree
+- conway.build()
+- conway.tree()
 - conway.Zero
 
 ## Comparison
 
-- conway.ge
-- conway.le
-- conway.greater
-- conway.less
-- conway.equal
-- conway.fuzzy
-- conway.compare
-- conway.isPos
-- conway.isNeg
-- conway.isZero
+- conway.ge()
+- conway.le()
+- conway.greater()
+- conway.less()
+- conway.equal()
+- conway.fuzzy()
+- conway.compare()
+- conway.isPos()
+- conway.isNeg()
+- conway.isZero()
 
 ## Arithmetic
 
-- conway.add
-- conway.sub
-- conway.multiply
-- conway.negative
+- conway.add()
+- conway.sub()
+- conway.multiply()
+- conway.negative()
 
 ## Class
 
@@ -44,4 +44,4 @@ import * as conway from 'conway-number' // esmodule
 
 ## Evaluation
 
-- conway.eval
+- conway.eval()

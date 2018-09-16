@@ -1,15 +1,7 @@
 type StringLike = string | RegExp
-export interface LexerOptions {
-  /** entrance context */
-  entrance?: string
-  /** default context */
-  default?: string
-  /** assign start/end to tokens */
-  requireBound?: boolean
-}
 
 export interface LexerToken {
-  type?: string
+  type: string
   text?: string
   content?: LexerToken[]
   start?: number
@@ -54,10 +46,6 @@ interface LexerRegexRule<S extends StringLike> {
   eol?: boolean
 }
 
-interface LexerWarning {
-  message: string
-}
-
 type LexerContext = string | NativeLexerRule[]
 type LexerRule<S extends StringLike> = LexerRegexRule<S> | LexerIncludeRule
 type LooseLexerRule = LexerRule<StringLike>
@@ -68,19 +56,15 @@ function getString(string: StringLike): string {
   return string instanceof RegExp ? string.source : string
 }
 
+interface LexerResult {
+  index: number
+  result: LexerToken[]
+}
+
 export class Lexer {
   private rules: Record<string, NativeLexerRule[]> = {}
-  private entrance: string
-  private default: string
-  private requireBound: boolean
-  private _warnings: LexerWarning[]
-  private _isRunning: boolean = false
   
-  constructor(rules: LexerRules, options: LexerOptions = {}) {
-    this.entrance = options.entrance || 'main'
-    this.default = options.default || 'text'
-    this.requireBound = !!options.requireBound 
-
+  constructor(rules: LexerRules) {
     function resolve(rule: LooseLexerRule): NativeLexerRule {
       if (!('include' in rule)) {
         if (rule.regex === undefined) {
@@ -122,15 +106,14 @@ export class Lexer {
     return result as LexerRegexRule<RegExp>[]
   }
 
-  private _parse(source: string, context: LexerContext, isTopLevel: boolean = false): {
-    index: number
-    result: LexerToken[]
-    warnings: LexerWarning[]
-  } {
+  public parse(
+    source: string,
+    context: LexerContext = 'main',
+    isTopLevel: boolean = true
+  ): LexerResult {
     let index = 0, unmatch = ''
     const result: LexerToken[] = []
     const rules = this.getContext(context)
-    const warnings: LexerWarning[] = this._warnings = []
     source = source.replace(/\r\n/g, '\n')
     while (source) {
       /**
@@ -159,15 +142,12 @@ export class Lexer {
         let content: LexerToken[] = [], push = rule.push
         if (typeof push === 'function') push = push.call(this, capture)
         if (push) {
-          const subtoken = this._parse(source, push as LexerContext)
+          const subtoken = this.parse(source, push as LexerContext, false)
           content = subtoken.result.map((tok) => {
-            if (this.requireBound && typeof tok === 'object') {
-              tok.start += index
-              tok.end += index
-            }
+            tok.start += index
+            tok.end += index
             return tok
           })
-          warnings.concat(subtoken.warnings)
           source = source.slice(subtoken.index)
           index += subtoken.index
         }
@@ -210,22 +190,6 @@ export class Lexer {
       type: 'unknown',
       text: unmatch
     })
-    return { index, result, warnings }
-  }
-
-  pushWarning(message) {
-    this._warnings.push({ message })
-  }
-
-  parse(source: string, context?: string): LexerToken[] {
-    let result
-    if (this._isRunning) {
-      result = this._parse(source, context || this.default).result
-    } else {
-      this._isRunning = true
-      result = this._parse(source, context || this.entrance, true).result
-      this._isRunning = false
-    }
-    return result
+    return { index, result }
   }
 }

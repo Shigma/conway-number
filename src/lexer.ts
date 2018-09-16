@@ -164,7 +164,7 @@ export class Lexer {
         // resolve unmatch
         if (unmatch) {
           result.push({
-            type: 'known',
+            type: 'unknown',
             text: unmatch,
           })
           unmatch = ''
@@ -179,7 +179,9 @@ export class Lexer {
       }
 
       if (!status) {
-        unmatch += source.charAt(0)
+        if (source.charAt(0) !== ' ') {
+          unmatch += source.charAt(0)
+        }
         source = source.slice(1)
         index += 1
       }
@@ -188,7 +190,7 @@ export class Lexer {
 
     if (unmatch) result.push({
       type: 'unknown',
-      text: unmatch
+      text: unmatch,
     })
     return { index, result }
   }

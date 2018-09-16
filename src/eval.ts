@@ -6,7 +6,10 @@ import ConwayImpartial from './impartial'
 const lexer = Lexer.from({
   main: [
     {
-      include: 'expression'
+      include: 'expression',
+    },
+    {
+      include: 'operator',
     },
   ],
   expression: [
@@ -25,19 +28,17 @@ const lexer = Lexer.from({
       })
     },
     {
-      regex: /(\d+)(?:([/.])(\d+))?/,
-      token(cap) {
-        return !cap[2] || cap[2] === '/' && devidedBy2(Number(cap[3])).quotient === 1
-          ? {
-            type: 'dyadic',
-            numerator: Number(cap[1]),
-            power: cap[2] ? Number(cap[3]) : 0,
-          }
-          : {
-            type: 'real',
-            value: cap[2] === '/' ? Number(cap[1]) / Number(cap[3]) : Number(cap[0])
-          }
-      }
+      regex: /([+-]?\d+)(?:([/.])(\d+))?/,
+      token: cap => !cap[2] || cap[2] === '/' && devidedBy2(Number(cap[3])).quotient === 1
+        ? {
+          type: 'dyadic',
+          numerator: Number(cap[1]),
+          power: cap[2] ? Number(cap[3]) : 0,
+        }
+        : {
+          type: 'real',
+          value: cap[2] === '/' ? Number(cap[1]) / Number(cap[3]) : Number(cap[0])
+        }
     },
     {
       regex: /{/,
@@ -48,7 +49,7 @@ const lexer = Lexer.from({
           pop: true,
         },
         {
-          regex: /, */,
+          regex: /,/,
         },
         {
           regex: /\|/,
@@ -58,7 +59,7 @@ const lexer = Lexer.from({
               pop: true,
             },
             {
-              regex: /, */,
+              regex: /,/,
             },
             {
               include: 'expression',
@@ -80,6 +81,29 @@ const lexer = Lexer.from({
           R: cont[cont.length - 1].content,
         }
       }
+    },
+  ],
+  operator: [
+    {
+      regex: /\+/,
+      token: () => ({
+        type: 'operator',
+        name: 'add',
+      })
+    },
+    {
+      regex: /-/,
+      token: () => ({
+        type: 'operator',
+        name: 'sub',
+      })
+    },
+    {
+      regex: /\*/,
+      token: () => ({
+        type: 'operator',
+        name: 'multiply',
+      })
     },
   ],
 })

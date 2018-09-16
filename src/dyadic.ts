@@ -1,4 +1,4 @@
-import { ConwayNumber } from './index'
+import { ConwayNumber, LSet, RSet } from './index'
 
 interface DevideResult {
   order: number
@@ -18,12 +18,14 @@ export function devidedBy2(n: number, max: number = Infinity): DevideResult {
 }
 
 export default class ConwayDyadic implements ConwayNumber {
-  _ln: number
-  _lp: number
-  _rn: number
-  _rp: number
-  numerator: number
-  power: number
+  private _ln: number
+  private _lp: number
+  private _rn: number
+  private _rp: number
+
+  public tag = 'dyadic'
+  public numerator: number
+  public power: number
 
   constructor(numerator: number, power: number = 0) {
     this.numerator = numerator
@@ -39,14 +41,14 @@ export default class ConwayDyadic implements ConwayNumber {
     }
   }
 
-  get L() {
-    if (!this.numerator || !this._lp && this._ln + 1 < this._rn && this._rn <= 0) return []
-    return [new ConwayDyadic(this._ln, this._lp)]
+  get L(): LSet {
+    if (!this.numerator || !this._lp && this._ln + 1 < this._rn && this._rn <= 0) return new LSet([])
+    return new LSet([new ConwayDyadic(this._ln, this._lp)])
   }
 
-  get R() {
-    if (!this.numerator || !this._rp && this._ln + 1 < this._rn && this._ln >= 0) return []
-    return [new ConwayDyadic(this._rn, this._rp)]
+  get R(): RSet {
+    if (!this.numerator || !this._rp && this._ln + 1 < this._rn && this._ln >= 0) return new RSet([])
+    return new RSet([new ConwayDyadic(this._rn, this._rp)])
   }
 
   toString(): string {

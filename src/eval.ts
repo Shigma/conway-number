@@ -3,90 +3,86 @@ import { Lexer, LexerToken } from './lexer'
 import ConwayDyadic, { devidedBy2 } from './dyadic'
 import ConwayImpartial from './impartial'
 
-const lexer = new (class extends Lexer {
-  constructor() {
-    super({
-      main: [
-        {
-          include: 'expression'
-        },
-      ],
-      expression: [
-        {
-          regex: /[a-zA-Z_]\w*/,
-          token: (cap) => ({
-            type: 'variable',
-            name: cap[0],
-          })
-        },
-        {
-          regex: /< *Impartial: *(\d+) *>/,
-          token: (cap) => ({
-            type: 'impartial',
-            order: Number(cap[1]),
-          })
-        },
-        {
-          regex: /(\d+)(?:([/.])(\d+))?/,
-          token(cap) {
-            return !cap[2] || cap[2] === '/' && devidedBy2(Number(cap[3])).quotient === 1
-              ? {
-                type: 'dyadic',
-                numerator: Number(cap[1]),
-                power: cap[2] ? Number(cap[3]) : 0,
-              }
-              : {
-                type: 'real',
-                value: cap[2] === '/' ? Number(cap[1]) / Number(cap[3]) : Number(cap[0])
-              }
+const lexer = Lexer.from({
+  main: [
+    {
+      include: 'expression'
+    },
+  ],
+  expression: [
+    {
+      regex: /[a-zA-Z_]\w*/,
+      token: (cap) => ({
+        type: 'variable',
+        name: cap[0],
+      })
+    },
+    {
+      regex: /< *Impartial: *(\d+) *>/,
+      token: (cap) => ({
+        type: 'impartial',
+        order: Number(cap[1]),
+      })
+    },
+    {
+      regex: /(\d+)(?:([/.])(\d+))?/,
+      token(cap) {
+        return !cap[2] || cap[2] === '/' && devidedBy2(Number(cap[3])).quotient === 1
+          ? {
+            type: 'dyadic',
+            numerator: Number(cap[1]),
+            power: cap[2] ? Number(cap[3]) : 0,
           }
+          : {
+            type: 'real',
+            value: cap[2] === '/' ? Number(cap[1]) / Number(cap[3]) : Number(cap[0])
+          }
+      }
+    },
+    {
+      regex: /{/,
+      type: 'literal',
+      push: [
+        {
+          regex: /}/,
+          pop: true,
         },
         {
-          regex: /{/,
-          type: 'literal',
+          regex: /, */,
+        },
+        {
+          regex: /\|/,
           push: [
             {
-              regex: /}/,
+              regex: /(?:})/,
               pop: true,
             },
             {
               regex: /, */,
             },
             {
-              regex: /\|/,
-              push: [
-                {
-                  regex: /(?:})/,
-                  pop: true,
-                },
-                {
-                  regex: /, */,
-                },
-                {
-                  include: 'expression',
-                },
-              ],
-              token: (cap, content) => ({
-                type: 'separator',
-                content,
-              })
-            },
-            {
               include: 'expression',
             },
           ],
-          token(cap, cont) {
-            return {
-              type: 'literal',
-              L: cont.slice(0, -1),
-              R: cont[cont.length - 1].content,
-            }
-          }
+          token: (cap, content) => ({
+            type: 'separator',
+            content,
+          })
+        },
+        {
+          include: 'expression',
         },
       ],
-    })
-  }
-})()
+      token(cap, cont) {
+        return {
+          type: 'literal',
+          L: cont.slice(0, -1),
+          R: cont[cont.length - 1].content,
+        }
+      }
+    },
+  ],
+})
 
 function parseNode(node: LexerToken): ConwayNumber {
   switch (node.type) {

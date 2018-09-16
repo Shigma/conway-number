@@ -6,21 +6,60 @@ import Impartial from './impartial'
 import evaluate from './eval'
 export { Dyadic, Impartial, evaluate as eval }
 
+import { gf, lf } from './comparison'
+
 export interface ConwayNumber {
+  tag?: string
+  L: ConwayLSet
+  R: ConwayRSet
+  [ key: string ]: any
   toString?: () => string
-  L: ConwayNumber[]
-  R: ConwayNumber[]
 }
 
-export const Zero: ConwayNumber = {
-  toString: () => '0',
-  L: [],
-  R: [],
+export interface ConwaySet {
+  map<T>(callback: (n: ConwayNumber, index: number, array: ConwayNumber[]) => T): T[]
+}
+
+export interface ConwayLSet extends ConwaySet {
+  lf(n: ConwayNumber): boolean
+  maxReduce?(): ConwayLSet
+}
+
+export class LRSet implements ConwaySet {
+  public data: ConwayNumber[]
+
+  constructor(data: ConwayNumber[]) {
+    this.data = data
+  }
+
+  map<T>(callback: (n: ConwayNumber, index: number, array: ConwayNumber[]) => T): T[] {
+    return this.data.map(callback)
+  }
+}
+
+export class LSet extends LRSet implements ConwayLSet {
+  lf(n: ConwayNumber): boolean {
+    return this.data.every(m => lf(m, n))
+  }
+}
+
+export interface ConwayRSet extends ConwaySet {
+  gf(n: ConwayNumber): boolean
+  minReduce?(): ConwayLSet
+}
+
+export class RSet extends LRSet implements ConwayRSet {
+  gf(n: ConwayNumber): boolean {
+    return this.data.every(m => gf(m, n))
+  }
 }
 
 export function build(L: ConwayNumber[], R: ConwayNumber[]): ConwayNumber {
-  return { L, R }
+  return { L: new LSet(L), R: new RSet(R) }
 }
+
+export const Zero: ConwayNumber = build([], [])
+Zero.toString = () => '0'
 
 export function tree(x: ConwayNumber, depth: number = 1): string {
   if (!depth) return x.toString()

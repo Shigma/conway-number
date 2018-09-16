@@ -2,10 +2,16 @@ import { UniOp, BinOp } from './types'
 import { Zero } from './index'
 
 /** greater than or equal to */
-export const ge: BinOp<boolean> = (x, y) => x.R.every(n => !ge(y, n)) && y.L.every(n => !ge(n, x))
+export const ge: BinOp<boolean> = (x, y) => x.R.gf(y) && y.L.lf(x)
 
 /** less than or equal to */
-export const le: BinOp<boolean> = (x, y) => y.R.every(n => !ge(x, n)) && x.L.every(n => !ge(n, y))
+export const le: BinOp<boolean> = (x, y) => y.R.gf(x) && x.L.lf(y)
+
+/** greater than or fuzzy with */
+export const gf: BinOp<boolean> = (x, y) => !le(x, y)
+
+/** less than or fuzzy with */
+export const lf: BinOp<boolean> = (x, y) => !ge(x, y)
 
 /** equal to */
 export const equal: BinOp<boolean> = (x, y) => ge(x, y) && le(x, y)
@@ -16,7 +22,7 @@ export const greater: BinOp<boolean> = (x, y) => ge(x, y) && !le(x, y)
 /** less than */
 export const less: BinOp<boolean> = (x, y) => !ge(x, y) && le(x, y)
 
-/** fuzzy between */
+/** fuzzy with */
 export const fuzzy: BinOp<boolean> = (x, y) => !ge(x, y) && !le(x, y)
 
 /** positive */

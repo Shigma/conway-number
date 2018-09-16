@@ -1,9 +1,10 @@
-import { ConwayNumber } from './index'
+import { ConwayNumber, LSet, RSet } from './index'
 
 const impartials = []
 
 export default class ConwayImpartial implements ConwayNumber {
-  order: number
+  public tag: 'impartial'
+  public order: number
 
   constructor(order: number) {
     this.order = order
@@ -15,12 +16,12 @@ export default class ConwayImpartial implements ConwayNumber {
     }
   }
 
-  get L(): ConwayNumber[] {
-    return impartials.slice(0, this.order)
+  get L(): LSet {
+    return new LSet(impartials.slice(0, this.order))
   }
 
-  get R(): ConwayNumber[] {
-    return impartials.slice(0, this.order)
+  get R(): RSet {
+    return new RSet(impartials.slice(0, this.order))
   }
 
   toString(): string {

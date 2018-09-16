@@ -192,4 +192,8 @@ export class Lexer {
     })
     return { index, result }
   }
+
+  static from(rules: LexerRules): Lexer {
+    return new Lexer(rules)
+  }
 }
